@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nebula Scratch — Free Scratch Card Game | LuckyNova</title>
+  <meta name="description" content="Play Nebula Scratch free at LuckyNova. Reveal 3 panels and match symbols to win virtual coins. No real money, no registration. UK adults 18+ only.">
+  <meta property="og:title" content="Nebula Scratch — Free Scratch Card Game | LuckyNova">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:url" content="https://luckynova.com/nebula-scratch.html">
+  <link rel="canonical" href="https://luckynova.com/nebula-scratch.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/ln-core.css">
+  <style>
+    /* ── PAGE HERO ──────────────────────────────────────── */
+    .sc-hero {
+      background: linear-gradient(180deg, #0d0519 0%, var(--ln-bg) 100%);
+      border-bottom: 1px solid var(--ln-border);
+      padding-block: 2.5rem;
+      text-align: center;
+    }
+    .sc-hero__back {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.85rem; color: var(--ln-muted);
+      margin-bottom: 1.5rem; text-decoration: none !important;
+      transition: color var(--ln-transition);
+    }
+    .sc-hero__back:hover { color: #c084fc; opacity: 1; }
+    .sc-hero h1 { font-size: clamp(1.75rem, 4vw, 2.75rem); margin-bottom: 0.4rem; }
+    .sc-hero h1 em { font-style: italic; color: #c084fc; }
+    .sc-hero p { color: var(--ln-muted); font-size: 0.9rem; }
+
+    /* ── LAYOUT ─────────────────────────────────────────── */
+    .sc-wrap { max-width: 560px; margin: 2.5rem auto; padding-inline: var(--ln-gutter); }
+
+    /* ── HUD BAR ────────────────────────────────────────── */
+    .sc-hud {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--ln-surface); border: 1px solid var(--ln-border);
+      border-radius: var(--ln-radius); padding: 0.75rem 1.25rem;
+      margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--ln-muted);
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+    .sc-hud__stat { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; }
+    .sc-hud__val { font-size: 1.2rem; font-weight: 700; color: #c084fc; }
+    .sc-hud__val.gold { color: var(--ln-gold); }
+    .sc-hud__label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    /* ── CARD WRAPPER ───────────────────────────────────── */
+    .sc-card {
+      background: linear-gradient(160deg, #150a2e 0%, #0f0622 60%, #0d0519 100%);
+      border: 1px solid #3b1d6e;
+      border-radius: var(--ln-radius);
+      padding: 1.75rem 1.5rem 1.5rem;
+      position: relative; overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+    .sc-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(192,132,252,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .sc-card__label {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: rgba(192,132,252,0.45); margin-bottom: 1rem; font-weight: 600;
+      text-align: center;
+    }
+
+    /* ── 3 PANELS ───────────────────────────────────────── */
+    .sc-panels {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+    .sc-panel {
+      aspect-ratio: 1;
+      border-radius: 10px;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Revealed face */
+    .sc-panel__face {
+      position: absolute; inset: 0;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1f0d44 0%, #150930 100%);
+      border: 1px solid #4b2080;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.35rem;
+    }
+    .sc-panel__symbol {
+      font-size: 2.4rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 6px rgba(192,132,252,0.5));
+    }
+    .sc-panel__name {
+      font-size: 0.62rem; text-transform: uppercase;
+      letter-spacing: 0.1em; color: rgba(192,132,252,0.7); font-weight: 600;
+    }
+
+    /* Scratch cover (canvas overlay) */
+    .sc-panel__cover {
+      position: absolute; inset: 0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .sc-panel__cover canvas {
+      display: block; width: 100%; height: 100%;
+      border-radius: 10px;
+      cursor: crosshair;
+    }
+    .sc-panel.revealed .sc-panel__cover { opacity: 0; pointer-events: none; }
+    .sc-panel.revealed .sc-panel__face { border-color: #7c3aed; }
+    .sc-panel.revealed.match .sc-panel__face {
+      background: linear-gradient(135deg, #2d1060 0%, #1a0940 100%);
+      border-color: #a855f7;
+      box-shadow: 0 0 18px rgba(168,85,247,0.35), inset 0 0 12px rgba(168,85,247,0.08);
+    }
+    .sc-panel.revealed.match .sc-panel__symbol {
+      filter: drop-shadow(0 0 10px rgba(192,132,252,0.85));
+    }
+
+    /* Click-to-reveal label on cover */
+    .sc-panel__hint {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.3rem; pointer-events: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #2a1458 0%, #1a0c3a 100%);
+      border: 1px solid #4b2080;
+    }
+    .sc-panel__hint-icon { font-size: 1.5rem; }
+    .sc-panel__hint-text {
+      font-size: 0.6rem; text-transform: uppercase;
+      letter-spacing: 0.12em; color: rgba(192,132,252,0.6);
+    }
+    .sc-panel.revealed .sc-panel__hint { display: none; }
+
+    /* ── RESULT BANNER ──────────────────────────────────── */
+    .sc-result {
+      text-align: center; padding: 1rem;
+      border-radius: 8px; font-weight: 700;
+      font-size: 1rem; margin-bottom: 1.25rem;
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .sc-result.visible { opacity: 1; }
+    .sc-result.win {
+      background: rgba(168,85,247,0.15);
+      border: 1px solid rgba(168,85,247,0.4);
+      color: #d8b4fe;
+    }
+    .sc-result.win .sc-result__amount { color: #c084fc; font-size: 1.4rem; }
+    .sc-result.lose {
+      background: rgba(100,60,160,0.08);
+      border: 1px solid rgba(100,60,160,0.25);
+      color: rgba(192,132,252,0.55);
+    }
+    .sc-result.jackpot {
+      background: rgba(234,179,8,0.1);
+      border: 1px solid rgba(234,179,8,0.35);
+      color: var(--ln-gold);
+    }
+    .sc-result.jackpot .sc-result__amount { color: var(--ln-gold); font-size: 1.6rem; }
+
+    /* ── BUTTONS ────────────────────────────────────────── */
+    .sc-btn-row { display: flex; gap: 0.75rem; justify-content: center; }
+    .sc-btn {
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px; border: none;
+      font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: all 0.18s;
+    }
+    .sc-btn--primary {
+      background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+      color: #fff;
+    }
+    .sc-btn--primary:hover:not(:disabled) {
+      background: linear-gradient(135deg, #6d28d9 0%, #7e22ce 100%);
+      transform: translateY(-1px);
+    }
+    .sc-btn--primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .sc-btn--ghost {
+      background: transparent;
+      border: 1px solid var(--ln-border);
+      color: var(--ln-muted);
+    }
+    .sc-btn--ghost:hover { border-color: #7c3aed; color: #c084fc; }
+
+    /* ── PAYTABLE ───────────────────────────────────────── */
+    .sc-paytable {
+      background: var(--ln-surface); border: 1px solid var(--ln-border);
+      border-radius: var(--ln-radius); padding: 1rem 1.25rem;
+      margin-top: 1.5rem; font-size: 0.82rem;
+    }
+    .sc-paytable__title {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--ln-muted); margin-bottom: 0.75rem; font-weight: 600;
+    }
+    .sc-paytable__rows { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 1.5rem; }
+    .sc-paytable__row { display: flex; justify-content: space-between; align-items: center; }
+    .sc-paytable__sym { letter-spacing: 0.05em; }
+    .sc-paytable__val { color: #c084fc; font-weight: 600; }
+
+    /* ── DISCLAIMER ─────────────────────────────────────── */
+    .sc-disclaimer {
+      font-size: 0.72rem; color: var(--ln-muted);
+      text-align: center; margin-top: 1.75rem; line-height: 1.5;
+    }
+
+    /* ── CONFETTI BURST ─────────────────────────────────── */
+    @keyframes confetti-fall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(80px) rotate(360deg); opacity: 0; }
+    }
+    .sc-confetti-particle {
+      position: fixed; pointer-events: none; z-index: 9999;
+      font-size: 1.2rem;
+      animation: confetti-fall 1s ease-in forwards;
+    }
+  </style>
+</head>
+<body>
+
+  <a class="ln-skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- ── TOPBAR ────────────────────────────────────────── -->
+  <header class="ln-topbar">
+    <div class="ln-container">
+      <div class="ln-topbar__inner">
+        <a href="index.html" class="ln-topbar__logo" aria-label="LuckyNova — home">
+          <span class="ln-logo-star" aria-hidden="true">✦</span> LuckyNova
+        </a>
+        <nav class="ln-topbar__nav" role="navigation" aria-label="Main navigation">
+          <a href="index.html#games">Games</a>
+          <a href="responsible-play.html">Responsible Play</a>
+          <a href="index.html#faq">FAQ</a>
+        </nav>
+        <div class="ln-topbar__right">
+          <span class="ln-badge-18" aria-label="18 plus only">18+</span>
+          <button class="ln-hamburger" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="main-nav">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <!-- ── HERO ─────────────────────────────────────────── -->
+    <section class="sc-hero" aria-label="Nebula Scratch hero">
+      <div class="ln-container">
+        <a href="index.html#games" class="sc-hero__back" aria-label="Back to all games">← Back to Games</a>
+        <h1>Nebula <em>Scratch</em></h1>
+        <p>Reveal three cosmic panels — match all three symbols to win virtual coins. Pure luck, zero real money.</p>
+      </div>
+    </section>
+
+    <!-- ── GAME ─────────────────────────────────────────── -->
+    <div class="sc-wrap">
+
+      <!-- HUD -->
+      <div class="sc-hud" role="status" aria-live="polite" aria-label="Game statistics">
+        <div class="sc-hud__stat">
+          <span class="sc-hud__val gold" id="hud-balance">500</span>
+          <span class="sc-hud__label">Balance</span>
+        </div>
+        <div class="sc-hud__stat">
+          <span class="sc-hud__val" id="hud-cost">−20</span>
+          <span class="sc-hud__label">Cost / Card</span>
+        </div>
+        <div class="sc-hud__stat">
+          <span class="sc-hud__val" id="hud-cards">0</span>
+          <span class="sc-hud__label">Cards Played</span>
+        </div>
+        <div class="sc-hud__stat">
+          <span class="sc-hud__val gold" id="hud-won">0</span>
+          <span class="sc-hud__label">Total Won</span>
+        </div>
+      </div>
+
+      <!-- Scratch card -->
+      <div class="sc-card" aria-label="Scratch card game area">
+        <p class="sc-card__label">Scratch Card #<span id="card-num">1</span> — Reveal all 3 panels</p>
+
+        <div class="sc-panels" id="sc-panels" role="group" aria-label="Scratch panels">
+
+          <div class="sc-panel" id="panel-0" role="button" tabindex="0" aria-label="Scratch panel 1">
+            <div class="sc-panel__face">
+              <span class="sc-panel__symbol" id="sym-0">🌌</span>
+              <span class="sc-panel__name" id="name-0">Nebula</span>
+            </div>
+            <div class="sc-panel__cover">
+              <canvas id="canvas-0" width="200" height="200"></canvas>
+            </div>
+            <div class="sc-panel__hint">
+              <span class="sc-panel__hint-icon">✨</span>
+              <span class="sc-panel__hint-text">Tap to reveal</span>
+            </div>
+          </div>
+
+          <div class="sc-panel" id="panel-1" role="button" tabindex="0" aria-label="Scratch panel 2">
+            <div class="sc-panel__face">
+              <span class="sc-panel__symbol" id="sym-1">🌌</span>
+              <span class="sc-panel__name" id="name-1">Nebula</span>
+            </div>
+            <div class="sc-panel__cover">
+              <canvas id="canvas-1" width="200" height="200"></canvas>
+            </div>
+            <div class="sc-panel__hint">
+              <span class="sc-panel__hint-icon">✨</span>
+              <span class="sc-panel__hint-text">Tap to reveal</span>
+            </div>
+          </div>
+
+          <div class="sc-panel" id="panel-2" role="button" tabindex="0" aria-label="Scratch panel 3">
+            <div class="sc-panel__face">
+              <span class="sc-panel__symbol" id="sym-2">🌌</span>
+              <span class="sc-panel__name" id="name-2">Nebula</span>
+            </div>
+            <div class="sc-panel__cover">
+              <canvas id="canvas-2" width="200" height="200"></canvas>
+            </div>
+            <div class="sc-panel__hint">
+              <span class="sc-panel__hint-icon">✨</span>
+              <span class="sc-panel__hint-text">Tap to reveal</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Result -->
+        <div class="sc-result" id="sc-result" role="alert" aria-live="assertive"></div>
+
+        <!-- Buttons -->
+        <div class="sc-btn-row">
+          <button class="sc-btn sc-btn--ghost" id="btn-reveal-all">Reveal All</button>
+          <button class="sc-btn sc-btn--primary" id="btn-new-card" disabled>New Card →</button>
+        </div>
+      </div>
+
+      <!-- Paytable -->
+      <div class="sc-paytable" aria-label="Prize paytable">
+        <p class="sc-paytable__title">Paytable — Match 3 to Win</p>
+        <div class="sc-paytable__rows">
+          <div class="sc-paytable__row">
+            <span class="sc-paytable__sym">🌟 🌟 🌟 Supernova</span>
+            <span class="sc-paytable__val">×25</span>
+          </div>
+          <div class="sc-paytable__row">
+            <span class="sc-paytable__sym">🪐 🪐 🪐 Saturn</span>
+            <span class="sc-paytable__val">×15</span>
+          </div>
+          <div class="sc-paytable__row">
+            <span class="sc-paytable__sym">☄️ ☄️ ☄️ Comet</span>
+            <span class="sc-paytable__val">×8</span>
+          </div>
+          <div class="sc-paytable__row">
+            <span class="sc-paytable__sym">🚀 🚀 🚀 Rocket</span>
+            <span class="sc-paytable__val">×5</span>
+          </div>
+          <div class="sc-paytable__row">
+            <span class="sc-paytable__sym">🌙 🌙 🌙 Moon</span>
+            <span class="sc-paytable__val">×3</span>
+          </div>
+          <div class="sc-paytable__row">
+            <span class="sc-paytable__sym">🌌 🌌 🌌 Nebula</span>
+            <span class="sc-paytable__val">×2</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="sc-disclaimer">
+        This is a free entertainment game. All coins are virtual with no monetary value whatsoever.<br>
+        No real money is used, wagered, or won. UK adults 18+ only.
+      </p>
+
+    </div>
+
+    <!-- ── SUPPORT ASIDE ──────────────────────────────── -->
+    <div class="ln-container">
+      <aside class="ln-support" aria-label="UK gambling support resources">
+        <p class="ln-support__title">Need Support? You Are Not Alone.</p>
+        <p>If gambling is causing you stress, free help is available 24/7.</p>
+        <div class="ln-support__links">
+          <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware</a>
+          <a href="https://www.gamcare.org.uk" target="_blank" rel="noopener noreferrer">GamCare 0808 8020 133</a>
+          <a href="https://www.gamstop.co.uk" target="_blank" rel="noopener noreferrer">GAMSTOP Self-Exclusion</a>
+          <a href="https://www.gamblingcommission.gov.uk" target="_blank" rel="noopener noreferrer">UK Gambling Commission</a>
+          <a href="https://www.samaritans.org" target="_blank" rel="noopener noreferrer">Samaritans 116 123</a>
+          <a href="https://www.nhs.uk/live-well/addiction-support/gambling-addiction/" target="_blank" rel="noopener noreferrer">NHS Gambling Support</a>
+        </div>
+      </aside>
+    </div>
+
+  </main>
+
+  <!-- ── FOOTER ────────────────────────────────────────── -->
+  <footer class="ln-footer" role="contentinfo">
+    <div class="ln-container">
+      <div class="ln-footer__grid">
+
+        <div class="ln-footer__col">
+          <a href="index.html" class="ln-footer__logo">✦ LuckyNova</a>
+          <p class="ln-footer__desc">A free social casino platform for UK adults 18+. No real-money gambling. Virtual coins only.</p>
+          <p class="ln-footer__disclaimer">Not affiliated with any gambling operator. Not licensed by UKGC.</p>
+        </div>
+
+        <div class="ln-footer__col">
+          <div class="ln-footer__col-title">Navigation</div>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#games">Games</a></li>
+            <li><a href="responsible-play.html">Responsible Play</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Use</a></li>
+            <li><a href="cookies.html">Cookie Policy</a></li>
+          </ul>
+        </div>
+
+        <div class="ln-footer__col">
+          <div class="ln-footer__col-title">Support</div>
+          <ul>
+            <li><a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware</a></li>
+            <li><a href="https://www.gamcare.org.uk" target="_blank" rel="noopener noreferrer">GamCare</a></li>
+            <li><a href="https://www.gamstop.co.uk" target="_blank" rel="noopener noreferrer">GAMSTOP</a></li>
+            <li><a href="https://www.gamblingcommission.gov.uk" target="_blank" rel="noopener noreferrer">Gambling Commission</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="ln-footer__bottom">
+        © <span data-year></span> LuckyNova. 18+ only. Not affiliated with any gambling operator.
+        All games are free to play. No real money, no real prizes.
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/ln-app.js" defer></script>
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── SYMBOL TABLE ──────────────────────────────────── */
+    const SYMBOLS = [
+      { id: 'nebula',    emoji: '🌌', name: 'Nebula',    mult: 2,  weight: 30 },
+      { id: 'moon',      emoji: '🌙', name: 'Moon',      mult: 3,  weight: 25 },
+      { id: 'rocket',    emoji: '🚀', name: 'Rocket',    mult: 5,  weight: 18 },
+      { id: 'comet',     emoji: '☄️', name: 'Comet',     mult: 8,  weight: 12 },
+      { id: 'saturn',    emoji: '🪐', name: 'Saturn',    mult: 15, weight: 9  },
+      { id: 'supernova', emoji: '🌟', name: 'Supernova', mult: 25, weight: 6  },
+    ];
+    const COST = 20;
+    const START_BALANCE = 500;
+
+    /* ── STATE ─────────────────────────────────────────── */
+    let balance    = START_BALANCE;
+    let totalWon   = 0;
+    let cardsPlayed = 0;
+    let cardSymbols = []; // [sym, sym, sym]
+    let revealed    = [false, false, false];
+    let cardDone    = false;
+
+    /* ── DOM REFS ──────────────────────────────────────── */
+    const hudBalance  = document.getElementById('hud-balance');
+    const hudCards    = document.getElementById('hud-cards');
+    const hudWon      = document.getElementById('hud-won');
+    const cardNumEl   = document.getElementById('card-num');
+    const resultEl    = document.getElementById('sc-result');
+    const btnReveal   = document.getElementById('btn-reveal-all');
+    const btnNew      = document.getElementById('btn-new-card');
+
+    const panels  = [0, 1, 2].map(i => document.getElementById('panel-' + i));
+    const symEls  = [0, 1, 2].map(i => document.getElementById('sym-'  + i));
+    const nameEls = [0, 1, 2].map(i => document.getElementById('name-' + i));
+    const canvases = [0, 1, 2].map(i => document.getElementById('canvas-' + i));
+
+    /* ── WEIGHTED RANDOM ───────────────────────────────── */
+    function weightedPick() {
+      const total = SYMBOLS.reduce((s, sym) => s + sym.weight, 0);
+      let r = Math.random() * total;
+      for (const sym of SYMBOLS) {
+        r -= sym.weight;
+        if (r <= 0) return sym;
+      }
+      return SYMBOLS[0];
+    }
+
+    /* ── GENERATE CARD ─────────────────────────────────── */
+    function generateCard() {
+      // ~18% chance of a win (the three panels share a symbol)
+      const isWin = Math.random() < 0.18;
+      if (isWin) {
+        const sym = weightedPick();
+        cardSymbols = [sym, sym, sym];
+      } else {
+        // Ensure at least two different symbols
+        let tries = 0;
+        do {
+          cardSymbols = [weightedPick(), weightedPick(), weightedPick()];
+          tries++;
+        } while (
+          (cardSymbols[0].id === cardSymbols[1].id && cardSymbols[1].id === cardSymbols[2].id)
+          && tries < 20
+        );
+      }
+    }
+
+    /* ── PAINT SCRATCH COVER ───────────────────────────── */
+    function paintCover(idx) {
+      const canvas = canvases[idx];
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+
+      // Gradient cover
+      const grd = ctx.createLinearGradient(0, 0, W, H);
+      grd.addColorStop(0, '#2a1458');
+      grd.addColorStop(0.5, '#1a0c3a');
+      grd.addColorStop(1, '#150930');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+
+      // Sparkle dots
+      ctx.fillStyle = 'rgba(192,132,252,0.25)';
+      for (let i = 0; i < 22; i++) {
+        const x = Math.random() * W, y = Math.random() * H;
+        const r = Math.random() * 2.5 + 0.5;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // "?" text
+      ctx.font = 'bold 56px sans-serif';
+      ctx.fillStyle = 'rgba(192,132,252,0.18)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('?', W / 2, H / 2);
+    }
+
+    /* ── SCRATCH ERASE (mouse / touch) ────────────────── */
+    function addScratchListeners(idx) {
+      const canvas = canvases[idx];
+      const ctx = canvas.getContext('2d');
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = 30;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      let drawing = false;
+      let lastX = 0, lastY = 0;
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width  / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return [(clientX - rect.left) * scaleX, (clientY - rect.top) * scaleY];
+      }
+
+      function pctScratched() {
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let clear = 0;
+        for (let i = 3; i < data.length; i += 4) if (data[i] < 128) clear++;
+        return clear / (canvas.width * canvas.height);
+      }
+
+      function onStart(e) {
+        if (revealed[idx] || cardDone) return;
+        e.preventDefault();
+        drawing = true;
+        [lastX, lastY] = getPos(e);
+      }
+      function onMove(e) {
+        if (!drawing || revealed[idx]) return;
+        e.preventDefault();
+        const [x, y] = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        [lastX, lastY] = [x, y];
+
+        if (pctScratched() > 0.55) revealPanel(idx);
+      }
+      function onEnd() { drawing = false; }
+
+      canvas.addEventListener('mousedown',  onStart, { passive: false });
+      canvas.addEventListener('mousemove',  onMove,  { passive: false });
+      canvas.addEventListener('mouseup',    onEnd);
+      canvas.addEventListener('touchstart', onStart, { passive: false });
+      canvas.addEventListener('touchmove',  onMove,  { passive: false });
+      canvas.addEventListener('touchend',   onEnd);
+    }
+
+    /* ── REVEAL PANEL ──────────────────────────────────── */
+    function revealPanel(idx) {
+      if (revealed[idx]) return;
+      revealed[idx] = true;
+      panels[idx].classList.add('revealed');
+      symEls[idx].textContent  = cardSymbols[idx].emoji;
+      nameEls[idx].textContent = cardSymbols[idx].name;
+
+      // Keyboard click-to-reveal
+      panels[idx].removeEventListener('keydown', keyReveal);
+
+      if (revealed.every(Boolean)) finaliseCard();
+    }
+
+    function revealAll() {
+      [0, 1, 2].forEach(i => revealPanel(i));
+    }
+
+    function keyReveal(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const idx = parseInt(this.id.replace('panel-', ''), 10);
+        if (!revealed[idx]) revealPanel(idx);
+      }
+    }
+
+    /* ── FINALISE CARD ─────────────────────────────────── */
+    function finaliseCard() {
+      cardDone = true;
+      btnReveal.disabled = true;
+      btnNew.disabled = false;
+
+      const allMatch = cardSymbols[0].id === cardSymbols[1].id && cardSymbols[1].id === cardSymbols[2].id;
+
+      if (allMatch) {
+        const sym = cardSymbols[0];
+        const prize = COST * sym.mult;
+        balance += prize;
+        totalWon += prize;
+        updateHUD();
+
+        const isJackpot = sym.mult >= 15;
+        panels.forEach(p => p.classList.add('match'));
+
+        resultEl.className = 'sc-result visible ' + (isJackpot ? 'jackpot' : 'win');
+        resultEl.innerHTML = isJackpot
+          ? `⭐ JACKPOT — ${sym.emoji} ${sym.name}! <span class="sc-result__amount">+${prize} coins</span>`
+          : `🎉 Winner! ${sym.emoji} ${sym.name} × 3 <span class="sc-result__amount">+${prize} coins</span>`;
+
+        if (isJackpot) launchConfetti();
+      } else {
+        resultEl.className = 'sc-result visible lose';
+        resultEl.innerHTML = 'No match this time — try another card!';
+      }
+    }
+
+    /* ── UPDATE HUD ────────────────────────────────────── */
+    function updateHUD() {
+      hudBalance.textContent = balance;
+      hudCards.textContent   = cardsPlayed;
+      hudWon.textContent     = totalWon;
+    }
+
+    /* ── CONFETTI BURST ────────────────────────────────── */
+    function launchConfetti() {
+      const sparks = ['🌟', '✨', '💫', '⭐', '🌌', '🪐'];
+      for (let i = 0; i < 18; i++) {
+        const el = document.createElement('span');
+        el.className = 'sc-confetti-particle';
+        el.textContent = sparks[Math.floor(Math.random() * sparks.length)];
+        el.style.left = (20 + Math.random() * 60) + 'vw';
+        el.style.top  = (30 + Math.random() * 20) + 'vh';
+        el.style.animationDelay = (Math.random() * 0.5) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1600);
+      }
+    }
+
+    /* ── DEAL NEW CARD ─────────────────────────────────── */
+    function dealNewCard() {
+      if (balance < COST) {
+        // Auto-refill
+        balance = START_BALANCE;
+      }
+      balance -= COST;
+      cardsPlayed++;
+      revealed = [false, false, false];
+      cardDone = false;
+      cardNumEl.textContent = cardsPlayed + 1;
+      updateHUD();
+
+      // Reset panels
+      panels.forEach((p, i) => {
+        p.classList.remove('revealed', 'match');
+        symEls[i].textContent  = '🌌';
+        nameEls[i].textContent = 'Nebula';
+        paintCover(i);
+        addScratchListeners(i);
+        p.addEventListener('keydown', keyReveal.bind(p));
+      });
+
+      // Reset result
+      resultEl.className = 'sc-result';
+      resultEl.innerHTML = '';
+
+      // Reset buttons
+      btnReveal.disabled = false;
+      btnNew.disabled    = true;
+
+      generateCard();
+    }
+
+    /* ── INIT ──────────────────────────────────────────── */
+    function init() {
+      balance -= COST; // cost of first card
+      cardsPlayed = 1;
+      updateHUD();
+      cardNumEl.textContent = 1;
+
+      generateCard();
+
+      // Paint covers & bind
+      [0, 1, 2].forEach(i => {
+        paintCover(i);
+        addScratchListeners(i);
+        panels[i].addEventListener('keydown', keyReveal.bind(panels[i]));
+      });
+
+      btnReveal.addEventListener('click', revealAll);
+      btnNew.addEventListener('click', dealNewCard);
+    }
+
+    init();
+  })();
+  </script>
+</body>
+</html>

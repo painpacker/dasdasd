@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cosmic Blackjack — Free Card Game | LuckyNova</title>
+  <meta name="description" content="Play Cosmic Blackjack free at LuckyNova. Beat the dealer with virtual coins. No real money, no registration. UK adults 18+ only.">
+  <meta property="og:title" content="Cosmic Blackjack — Free Card Game | LuckyNova">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:url" content="https://luckynova.com/cosmic-blackjack.html">
+  <link rel="canonical" href="https://luckynova.com/cosmic-blackjack.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/ln-core.css">
+  <style>
+    .bj-hero {
+      background: linear-gradient(180deg, #0a0f0e 0%, var(--ln-bg) 100%);
+      border-bottom: 1px solid var(--ln-border);
+      padding-block: 2.5rem;
+      text-align: center;
+    }
+    .bj-hero__back {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.85rem; color: var(--ln-muted);
+      margin-bottom: 1.5rem; text-decoration: none !important;
+      transition: color var(--ln-transition);
+    }
+    .bj-hero__back:hover { color: #4ade80; opacity: 1; }
+    .bj-hero h1 { font-size: clamp(1.75rem, 4vw, 2.75rem); margin-bottom: 0.4rem; }
+    .bj-hero h1 em { font-style: italic; color: #4ade80; }
+    .bj-hero p { color: var(--ln-muted); font-size: 0.9rem; }
+
+    .bj-wrap { max-width: 580px; margin: 2.5rem auto; padding-inline: var(--ln-gutter); }
+
+    /* Table */
+    .bj-table {
+      background: linear-gradient(160deg, #061a0e 0%, #071510 50%, #050f09 100%);
+      border: 1px solid #1a3a25;
+      border-radius: var(--ln-radius);
+      padding: 1.75rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .bj-table::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.05) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    /* Hand areas */
+    .bj-hand-label {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: rgba(74,222,128,0.5); margin-bottom: 0.6rem; font-weight: 600;
+    }
+    .bj-hand { display: flex; gap: 0.5rem; flex-wrap: wrap; min-height: 90px; align-items: flex-start; margin-bottom: 0.5rem; }
+    .bj-total {
+      font-size: 0.8rem; color: rgba(255,255,255,0.4);
+      margin-bottom: 1.25rem; min-height: 1.2rem;
+    }
+    .bj-total strong { color: #4ade80; font-size: 1rem; }
+    .bj-total.bust strong { color: #f87171; }
+    .bj-total.bj strong { color: var(--ln-gold); }
+
+    /* Divider */
+    .bj-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(74,222,128,0.2), transparent);
+      margin: 1rem 0;
+    }
+
+    /* Cards */
+    .bj-card {
+      width: 60px; height: 84px;
+      background: #fff;
+      border-radius: 7px;
+      display: flex; flex-direction: column;
+      align-items: flex-start; justify-content: space-between;
+      padding: 5px 6px;
+      font-size: 1rem; font-weight: 700;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+      position: relative;
+      animation: card-deal 0.25s ease;
+      flex-shrink: 0;
+    }
+    @keyframes card-deal {
+      from { opacity: 0; transform: translateY(-12px) scale(0.9); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .bj-card.red  { color: #dc2626; }
+    .bj-card.black { color: #111; }
+    .bj-card .bj-card__rank-top { font-size: 0.8rem; line-height: 1; }
+    .bj-card .bj-card__suit { font-size: 1.3rem; line-height: 1; align-self: center; }
+    .bj-card .bj-card__rank-bot { font-size: 0.8rem; line-height: 1; align-self: flex-end; transform: rotate(180deg); }
+
+    /* Hidden card */
+    .bj-card.hidden {
+      background: linear-gradient(135deg, #1a2f40 25%, #0d1a24 25%, #0d1a24 50%, #1a2f40 50%, #1a2f40 75%, #0d1a24 75%);
+      background-size: 12px 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.6);
+    }
+    .bj-card.hidden * { display: none; }
+
+    /* Stats bar */
+    .bj-stats {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(0,0,0,0.3); border: 1px solid #1a3a25;
+      border-radius: var(--ln-radius-sm); padding: 0.75rem 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .bj-stat { text-align: center; }
+    .bj-stat__label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); }
+    .bj-stat__val { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .bj-stat__val.green { color: #4ade80; }
+    .bj-stat__val.gold  { color: var(--ln-gold); }
+
+    /* Message */
+    .bj-message {
+      text-align: center; min-height: 2rem;
+      font-size: 1.05rem; font-weight: 700;
+      letter-spacing: 0.02em; margin-bottom: 1rem;
+      color: #fff;
+    }
+    .bj-message.win  { color: #4ade80; }
+    .bj-message.lose { color: #f87171; }
+    .bj-message.push { color: var(--ln-gold); }
+
+    /* Buttons */
+    .bj-btn-row { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+
+    .bj-btn {
+      padding: 0.7em 1.4em; border: none; border-radius: var(--ln-radius-sm);
+      font-family: var(--ln-font-body); font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; transition: transform var(--ln-transition), box-shadow var(--ln-transition), opacity var(--ln-transition);
+      letter-spacing: 0.02em;
+    }
+    .bj-btn:hover:not(:disabled) { transform: translateY(-2px); }
+    .bj-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+    .bj-btn--deal { background: #4ade80; color: #052e16; }
+    .bj-btn--deal:hover:not(:disabled) { box-shadow: 0 4px 18px rgba(74,222,128,0.4); }
+    .bj-btn--hit  { background: var(--ln-gold); color: var(--ln-bg); }
+    .bj-btn--hit:hover:not(:disabled) { box-shadow: 0 4px 18px rgba(244,197,66,0.4); }
+    .bj-btn--stand { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.25); }
+    .bj-btn--stand:hover:not(:disabled) { border-color: #fff; }
+    .bj-btn--double { background: var(--ln-purple); color: #fff; }
+    .bj-btn--double:hover:not(:disabled) { box-shadow: 0 4px 18px rgba(139,92,246,0.4); }
+
+    /* Bet display */
+    .bj-bet-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.75rem; margin-bottom: 1rem; font-size: 0.875rem; color: rgba(255,255,255,0.5);
+    }
+    .bj-bet-val { color: var(--ln-gold); font-weight: 700; font-size: 1rem; }
+
+    @media (max-width: 400px) {
+      .bj-card { width: 50px; height: 72px; }
+      .bj-btn { padding: 0.65em 1em; font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+  <a class="ln-skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="ln-topbar">
+    <div class="ln-container">
+      <div class="ln-topbar__inner">
+        <a href="index.html" class="ln-topbar__logo" aria-label="LuckyNova — home">
+          <span class="ln-logo-star" aria-hidden="true">✦</span> LuckyNova
+        </a>
+        <nav class="ln-topbar__nav" role="navigation" aria-label="Main navigation">
+          <a href="index.html#games">Games</a>
+          <a href="responsible-play.html">Responsible Play</a>
+          <a href="index.html#faq">FAQ</a>
+        </nav>
+        <div class="ln-topbar__right">
+          <span class="ln-badge-18" aria-label="18 plus only">18+</span>
+          <button class="ln-hamburger" aria-label="Toggle navigation menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="bj-hero">
+      <div class="ln-container">
+        <a href="index.html#games" class="bj-hero__back">← Back to Games</a>
+        <h1>Cosmic <em>Blackjack</em></h1>
+        <p>Beat the dealer to 21 · Virtual coins only · 18+ only</p>
+      </div>
+    </section>
+
+    <div class="bj-wrap">
+
+      <!-- Stats -->
+      <div class="bj-stats">
+        <div class="bj-stat">
+          <div class="bj-stat__label">Balance</div>
+          <div class="bj-stat__val gold" id="bj-balance">500</div>
+        </div>
+        <div class="bj-stat">
+          <div class="bj-stat__label">Bet</div>
+          <div class="bj-stat__val" id="bj-bet-display">20</div>
+        </div>
+        <div class="bj-stat">
+          <div class="bj-stat__label">Wins</div>
+          <div class="bj-stat__val green" id="bj-wins">0</div>
+        </div>
+        <div class="bj-stat">
+          <div class="bj-stat__label">Hands</div>
+          <div class="bj-stat__val" id="bj-hands">0</div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="bj-table">
+
+        <!-- Dealer -->
+        <div class="bj-hand-label">Dealer</div>
+        <div class="bj-hand" id="bj-dealer-hand" aria-live="polite"></div>
+        <div class="bj-total" id="bj-dealer-total"></div>
+
+        <div class="bj-divider"></div>
+
+        <!-- Player -->
+        <div class="bj-hand-label">You</div>
+        <div class="bj-hand" id="bj-player-hand" aria-live="polite"></div>
+        <div class="bj-total" id="bj-player-total"></div>
+
+        <!-- Message -->
+        <div class="bj-message" id="bj-message" aria-live="polite">Deal to start a new hand</div>
+
+        <!-- Buttons -->
+        <div class="bj-btn-row">
+          <button class="bj-btn bj-btn--deal"   id="bj-deal">Deal (20 coins)</button>
+          <button class="bj-btn bj-btn--hit"    id="bj-hit"    disabled>Hit</button>
+          <button class="bj-btn bj-btn--stand"  id="bj-stand"  disabled>Stand</button>
+          <button class="bj-btn bj-btn--double" id="bj-double" disabled>Double</button>
+        </div>
+
+      </div>
+
+      <p class="ln-game-disclaimer" style="margin-top:1.25rem;">
+        Virtual coins only · No real-money value · For entertainment purposes only · 18+ · Standard blackjack rules apply
+      </p>
+    </div>
+
+    <div class="ln-container">
+      <aside class="ln-support" aria-label="UK gambling support resources">
+        <p class="ln-support__title">Need Support? You Are Not Alone.</p>
+        <p>If gambling is causing you stress, free help is available 24/7.</p>
+        <div class="ln-support__links">
+          <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware</a>
+          <a href="https://www.gamcare.org.uk" target="_blank" rel="noopener noreferrer">GamCare 0808 8020 133</a>
+          <a href="https://www.gamstop.co.uk" target="_blank" rel="noopener noreferrer">GAMSTOP Self-Exclusion</a>
+          <a href="https://www.gamblingcommission.gov.uk" target="_blank" rel="noopener noreferrer">UK Gambling Commission</a>
+          <a href="https://www.samaritans.org" target="_blank" rel="noopener noreferrer">Samaritans 116 123</a>
+          <a href="https://www.nhs.uk/live-well/addiction-support/gambling-addiction/" target="_blank" rel="noopener noreferrer">NHS Gambling Support</a>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="ln-footer" role="contentinfo">
+    <div class="ln-container">
+      <div class="ln-footer__grid">
+        <div class="ln-footer__col">
+          <a href="index.html" class="ln-footer__logo">✦ LuckyNova</a>
+          <p class="ln-footer__desc">A free social casino platform for UK adults 18+. No real-money gambling. Virtual coins only.</p>
+          <p class="ln-footer__disclaimer">Not affiliated with any gambling operator. Not licensed by UKGC.</p>
+        </div>
+        <div class="ln-footer__col">
+          <div class="ln-footer__col-title">Navigation</div>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#games">Games</a></li>
+            <li><a href="responsible-play.html">Responsible Play</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Use</a></li>
+            <li><a href="cookies.html">Cookie Policy</a></li>
+          </ul>
+        </div>
+        <div class="ln-footer__col">
+          <div class="ln-footer__col-title">Support</div>
+          <ul>
+            <li><a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware</a></li>
+            <li><a href="https://www.gamcare.org.uk" target="_blank" rel="noopener noreferrer">GamCare</a></li>
+            <li><a href="https://www.gamstop.co.uk" target="_blank" rel="noopener noreferrer">GAMSTOP</a></li>
+            <li><a href="https://www.gamblingcommission.gov.uk" target="_blank" rel="noopener noreferrer">Gambling Commission</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="ln-footer__bottom">
+        © <span data-year></span> LuckyNova. 18+ only. Not affiliated with any gambling operator.
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/ln-app.js" defer></script>
+  <script>
+  (function () {
+    var SUITS = ['♠','♣','♥','♦'];
+    var RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+    var BET = 20, START = 500;
+    var balance = START, wins = 0, hands = 0;
+    var deck = [], playerHand = [], dealerHand = [], gameActive = false, betDoubled = false;
+
+    var balEl   = document.getElementById('bj-balance');
+    var winsEl  = document.getElementById('bj-wins');
+    var handsEl = document.getElementById('bj-hands');
+    var msgEl   = document.getElementById('bj-message');
+    var pHandEl = document.getElementById('bj-player-hand');
+    var dHandEl = document.getElementById('bj-dealer-hand');
+    var pTotEl  = document.getElementById('bj-player-total');
+    var dTotEl  = document.getElementById('bj-dealer-total');
+    var dealBtn   = document.getElementById('bj-deal');
+    var hitBtn    = document.getElementById('bj-hit');
+    var standBtn  = document.getElementById('bj-stand');
+    var doubleBtn = document.getElementById('bj-double');
+
+    function buildDeck() {
+      deck = [];
+      for (var s = 0; s < SUITS.length; s++)
+        for (var r = 0; r < RANKS.length; r++)
+          deck.push({ suit: SUITS[s], rank: RANKS[r] });
+      // Shuffle
+      for (var i = deck.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = deck[i]; deck[i] = deck[j]; deck[j] = t;
+      }
+    }
+
+    function cardValue(rank) {
+      if (['J','Q','K'].indexOf(rank) !== -1) return 10;
+      if (rank === 'A') return 11;
+      return parseInt(rank, 10);
+    }
+
+    function handTotal(hand) {
+      var total = 0, aces = 0;
+      hand.forEach(function (c) {
+        total += cardValue(c.rank);
+        if (c.rank === 'A') aces++;
+      });
+      while (total > 21 && aces > 0) { total -= 10; aces--; }
+      return total;
+    }
+
+    function isRed(suit) { return suit === '♥' || suit === '♦'; }
+
+    function renderCard(card, hidden) {
+      var el = document.createElement('div');
+      el.className = 'bj-card' + (hidden ? ' hidden' : (isRed(card.suit) ? ' red' : ' black'));
+      if (!hidden) {
+        el.innerHTML =
+          '<span class="bj-card__rank-top">' + card.rank + card.suit + '</span>' +
+          '<span class="bj-card__suit">' + card.suit + '</span>' +
+          '<span class="bj-card__rank-bot">' + card.rank + card.suit + '</span>';
+      }
+      return el;
+    }
+
+    function renderHands(revealDealer) {
+      pHandEl.innerHTML = ''; dHandEl.innerHTML = '';
+      playerHand.forEach(function (c) { pHandEl.appendChild(renderCard(c, false)); });
+      dealerHand.forEach(function (c, i) {
+        dHandEl.appendChild(renderCard(c, i === 1 && !revealDealer));
+      });
+      var pt = handTotal(playerHand);
+      pTotEl.className = 'bj-total' + (pt > 21 ? ' bust' : pt === 21 ? ' bj' : '');
+      pTotEl.innerHTML = 'Total: <strong>' + pt + '</strong>' + (pt > 21 ? ' — Bust!' : pt === 21 ? ' — Blackjack!' : '');
+
+      if (revealDealer) {
+        var dt = handTotal(dealerHand);
+        dTotEl.className = 'bj-total' + (dt > 21 ? ' bust' : dt === 21 ? ' bj' : '');
+        dTotEl.innerHTML = 'Total: <strong>' + dt + '</strong>' + (dt > 21 ? ' — Bust!' : dt === 21 ? ' — Blackjack!' : '');
+      } else {
+        dTotEl.innerHTML = 'Total: <strong>' + cardValue(dealerHand[0].rank) + '</strong> + ?';
+        dTotEl.className = 'bj-total';
+      }
+    }
+
+    function updateStats() {
+      balEl.textContent  = balance;
+      winsEl.textContent = wins;
+      handsEl.textContent = hands;
+      dealBtn.disabled = balance < BET;
+    }
+
+    function setMsg(text, cls) {
+      msgEl.textContent = text;
+      msgEl.className = 'bj-message' + (cls ? ' ' + cls : '');
+    }
+
+    function setActionBtns(active) {
+      hitBtn.disabled    = !active;
+      standBtn.disabled  = !active;
+      doubleBtn.disabled = !active || balance < BET || betDoubled;
+      dealBtn.disabled   = active || balance < BET;
+    }
+
+    function draw() { return deck.pop(); }
+
+    function deal() {
+      if (balance < BET) return;
+      buildDeck();
+      playerHand = [draw(), draw()];
+      dealerHand = [draw(), draw()];
+      betDoubled = false;
+      balance -= BET;
+      hands++;
+      gameActive = true;
+      renderHands(false);
+      updateStats();
+      setActionBtns(true);
+
+      var pt = handTotal(playerHand);
+      if (pt === 21) {
+        // Natural blackjack
+        setMsg('Blackjack! Revealing dealer…', 'win');
+        setTimeout(resolve, 600);
+      } else {
+        setMsg('Hit, Stand, or Double?', '');
+      }
+    }
+
+    function hit() {
+      if (!gameActive) return;
+      playerHand.push(draw());
+      renderHands(false);
+      var pt = handTotal(playerHand);
+      if (pt > 21) { resolve(); }
+      else if (pt === 21) { setMsg('21! Standing…', 'win'); setTimeout(resolve, 400); }
+      // Disable double after first hit
+      doubleBtn.disabled = true;
+    }
+
+    function stand() { if (gameActive) resolve(); }
+
+    function dbl() {
+      if (!gameActive || balance < BET) return;
+      balance -= BET;
+      betDoubled = true;
+      updateStats();
+      playerHand.push(draw());
+      renderHands(false);
+      var pt = handTotal(playerHand);
+      if (pt > 21) { resolve(); }
+      else { setTimeout(resolve, 300); }
+    }
+
+    function resolve() {
+      gameActive = false;
+      setActionBtns(false);
+
+      // Dealer draws to 17+
+      while (handTotal(dealerHand) < 17) dealerHand.push(draw());
+
+      renderHands(true);
+
+      var pt = handTotal(playerHand);
+      var dt = handTotal(dealerHand);
+      var currentBet = betDoubled ? BET * 2 : BET;
+      var playerBJ = pt === 21 && playerHand.length === 2;
+      var dealerBJ = dt === 21 && dealerHand.length === 2;
+
+      if (pt > 21) {
+        setMsg('Bust! Dealer wins.', 'lose');
+      } else if (dealerBJ && !playerBJ) {
+        setMsg('Dealer Blackjack — you lose.', 'lose');
+      } else if (playerBJ && !dealerBJ) {
+        var bjPay = Math.floor(currentBet * 1.5);
+        balance += currentBet + bjPay;
+        wins++;
+        setMsg('Blackjack! You win ' + bjPay + ' bonus coins! 🎉', 'win');
+      } else if (dt > 21 || pt > dt) {
+        balance += currentBet * 2;
+        wins++;
+        setMsg('You win ' + currentBet + ' coins! 🎉', 'win');
+      } else if (pt === dt) {
+        balance += currentBet;
+        setMsg('Push — bet returned.', 'push');
+      } else {
+        setMsg('Dealer wins. Better luck next hand!', 'lose');
+      }
+
+      if (balance < BET) {
+        balance = START;
+        setTimeout(function () { setMsg('Balance refilled to 500 coins. Keep playing! 🚀', 'push'); }, 1500);
+      }
+
+      updateStats();
+    }
+
+    dealBtn.addEventListener('click', deal);
+    hitBtn.addEventListener('click', hit);
+    standBtn.addEventListener('click', stand);
+    doubleBtn.addEventListener('click', dbl);
+
+    updateStats();
+    setActionBtns(false);
+  })();
+  </script>
+</body>
+</html>

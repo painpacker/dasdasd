@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nova Slots — Free Cosmic Slot Game | LuckyNova</title>
+  <meta name="description" content="Play Nova Slots free at LuckyNova. Spin cosmic 3-reel slots with virtual coins. No real money, no registration. UK adults 18+ only.">
+  <meta property="og:title" content="Nova Slots — Free Cosmic Slot Game | LuckyNova">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:url" content="https://luckynova.com/nova-slots.html">
+  <link rel="canonical" href="https://luckynova.com/nova-slots.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/ln-core.css">
+  <style>
+    /* ── PAGE-SPECIFIC: Nova Slots ── */
+    .ns-page { background: var(--ln-bg); }
+
+    .ns-hero {
+      background: linear-gradient(180deg, #0e0e1c 0%, var(--ln-bg) 100%);
+      border-bottom: 1px solid var(--ln-border);
+      padding-block: 2.5rem;
+      text-align: center;
+    }
+    .ns-hero__back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--ln-muted);
+      margin-bottom: 1.5rem;
+      text-decoration: none !important;
+      transition: color var(--ln-transition);
+    }
+    .ns-hero__back:hover { color: var(--ln-gold); opacity: 1; }
+    .ns-hero h1 { font-size: clamp(1.75rem, 4vw, 2.75rem); margin-bottom: 0.4rem; }
+    .ns-hero h1 em { font-style: italic; color: var(--ln-gold); }
+    .ns-hero p { color: var(--ln-muted); font-size: 0.9rem; }
+
+    /* Game wrapper */
+    .ns-game-wrap {
+      max-width: 540px;
+      margin: 3rem auto;
+      padding-inline: var(--ln-gutter);
+    }
+
+    .ns-game-card {
+      background: var(--ln-surface);
+      border: 1px solid var(--ln-border);
+      border-radius: var(--ln-radius);
+      overflow: hidden;
+    }
+
+    /* Reel display */
+    .ns-reels-area {
+      background: linear-gradient(180deg, #0a0a14 0%, #111120 100%);
+      padding: 2rem 1.5rem 1.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--ln-border);
+      position: relative;
+    }
+
+    /* Decorative lines */
+    .ns-reel-lines {
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 2px;
+      background: rgba(244,197,66,0.15);
+      pointer-events: none;
+    }
+
+    .ns-reels {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .ns-reel {
+      width: 96px;
+      height: 96px;
+      background: #07070f;
+      border: 2px solid var(--ln-border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .ns-reel.spinning { animation: ns-spin 0.1s linear infinite; }
+    .ns-reel.win {
+      border-color: var(--ln-gold);
+      box-shadow: 0 0 18px rgba(244,197,66,0.45), inset 0 0 12px rgba(244,197,66,0.08);
+    }
+
+    @keyframes ns-spin {
+      0%   { transform: translateY(0); }
+      25%  { transform: translateY(-6px); }
+      75%  { transform: translateY(6px); }
+      100% { transform: translateY(0); }
+    }
+
+    /* Payline indicator */
+    .ns-payline {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .ns-payline span {
+      width: 96px;
+      height: 2px;
+      background: rgba(244,197,66,0.2);
+      border-radius: 1px;
+    }
+
+    /* Controls area */
+    .ns-controls {
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .ns-balance {
+      font-size: 0.9rem;
+      color: var(--ln-muted);
+      margin-bottom: 0.75rem;
+    }
+    .ns-balance strong {
+      color: var(--ln-gold);
+      font-size: 1.5rem;
+      font-family: var(--ln-font-heading);
+    }
+    .ns-balance span { font-size: 0.8rem; }
+
+    .ns-message {
+      min-height: 1.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ln-gold);
+      margin-bottom: 1rem;
+      letter-spacing: 0.01em;
+    }
+
+    .ns-btn-row {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+
+    .ns-spin-btn {
+      min-width: 160px;
+      font-size: 1.05rem;
+      padding: 0.85em 2em;
+      background: linear-gradient(135deg, var(--ln-gold) 0%, #e8b820 100%);
+      color: var(--ln-bg);
+      border: none;
+      border-radius: var(--ln-radius-sm);
+      font-family: var(--ln-font-body);
+      font-weight: 700;
+      cursor: pointer;
+      transition: box-shadow var(--ln-transition), transform var(--ln-transition);
+      letter-spacing: 0.02em;
+    }
+    .ns-spin-btn:hover:not(:disabled) {
+      box-shadow: 0 6px 24px rgba(244,197,66,0.4);
+      transform: translateY(-2px);
+    }
+    .ns-spin-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+    .ns-reset-btn {
+      min-width: 120px;
+      font-size: 0.9rem;
+      padding: 0.85em 1.5em;
+      background: transparent;
+      color: var(--ln-text);
+      border: 2px solid var(--ln-border);
+      border-radius: var(--ln-radius-sm);
+      font-family: var(--ln-font-body);
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color var(--ln-transition), color var(--ln-transition);
+    }
+    .ns-reset-btn:hover { border-color: var(--ln-gold); color: var(--ln-gold); }
+
+    .ns-bet-info {
+      font-size: 0.78rem;
+      color: var(--ln-muted);
+    }
+
+    /* Paytable */
+    .ns-paytable {
+      border-top: 1px solid var(--ln-border);
+      padding: 1.25rem 1.5rem;
+    }
+    .ns-paytable h3 {
+      font-family: var(--ln-font-body);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ln-muted);
+      margin-bottom: 0.75rem;
+    }
+    .ns-paytable-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.3rem 1.5rem;
+      font-size: 0.82rem;
+    }
+    .ns-pt-row { display: flex; justify-content: space-between; align-items: center; }
+    .ns-pt-combo { color: var(--ln-text); letter-spacing: 0.05em; }
+    .ns-pt-val { color: var(--ln-gold); font-weight: 600; }
+
+    /* Disclaimer */
+    .ns-disclaimer {
+      margin: 1.5rem auto 0;
+      max-width: 540px;
+      padding-inline: var(--ln-gutter);
+    }
+
+    @media (max-width: 480px) {
+      .ns-reel { width: 78px; height: 78px; font-size: 2.2rem; }
+      .ns-reels { gap: 0.6rem; }
+      .ns-payline span { width: 78px; }
+    }
+  </style>
+</head>
+<body class="ns-page">
+
+  <a class="ln-skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- ── TOPBAR ─────────────────────────────────────── -->
+  <header class="ln-topbar">
+    <div class="ln-container">
+      <div class="ln-topbar__inner">
+        <a href="index.html" class="ln-topbar__logo" aria-label="LuckyNova — home">
+          <span class="ln-logo-star" aria-hidden="true">✦</span> LuckyNova
+        </a>
+        <nav class="ln-topbar__nav" role="navigation" aria-label="Main navigation">
+          <a href="index.html#games">Games</a>
+          <a href="responsible-play.html">Responsible Play</a>
+          <a href="index.html#faq">FAQ</a>
+        </nav>
+        <div class="ln-topbar__right">
+          <span class="ln-badge-18" aria-label="18 plus only">18+</span>
+          <button class="ln-hamburger" aria-label="Toggle navigation menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <!-- ── HERO ──────────────────────────────────────── -->
+    <section class="ns-hero">
+      <div class="ln-container">
+        <a href="index.html#games" class="ns-hero__back">← Back to Games</a>
+        <h1>Nova <em>Slots</em></h1>
+        <p>Cosmic 3-reel slots · Virtual coins only · 18+ only</p>
+      </div>
+    </section>
+
+    <!-- ── GAME ──────────────────────────────────────── -->
+    <div class="ns-game-wrap" id="main-content-game">
+
+      <div class="ns-game-card">
+
+        <!-- Reels -->
+        <div class="ns-reels-area">
+          <div class="ns-reel-lines" aria-hidden="true"></div>
+          <div class="ns-reels" role="img" aria-label="Slot machine reels">
+            <div class="ns-reel" id="ns-reel-1" aria-live="polite">⭐</div>
+            <div class="ns-reel" id="ns-reel-2" aria-live="polite">⭐</div>
+            <div class="ns-reel" id="ns-reel-3" aria-live="polite">⭐</div>
+          </div>
+          <div class="ns-payline" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="ns-controls">
+          <div class="ns-balance">
+            <strong id="ns-balance">500</strong>
+            <span> virtual coins</span>
+          </div>
+
+          <div class="ns-message" id="ns-message" aria-live="polite"></div>
+
+          <div class="ns-btn-row">
+            <button class="ns-spin-btn" id="ns-spin">Spin</button>
+            <button class="ns-reset-btn" id="ns-reset" style="display:none">Try Again</button>
+          </div>
+          <div class="ns-bet-info">Cost per spin: 10 coins</div>
+        </div>
+
+        <!-- Paytable -->
+        <div class="ns-paytable">
+          <h3>Paytable</h3>
+          <div class="ns-paytable-grid">
+            <div class="ns-pt-row"><span class="ns-pt-combo">🪐🪐🪐</span><span class="ns-pt-val">+100</span></div>
+            <div class="ns-pt-row"><span class="ns-pt-combo">🚀🚀🚀</span><span class="ns-pt-val">+80</span></div>
+            <div class="ns-pt-row"><span class="ns-pt-combo">☄️☄️☄️</span><span class="ns-pt-val">+60</span></div>
+            <div class="ns-pt-row"><span class="ns-pt-combo">🌟🌟🌟</span><span class="ns-pt-val">+40</span></div>
+            <div class="ns-pt-row"><span class="ns-pt-combo">🌙🌙🌙</span><span class="ns-pt-val">+25</span></div>
+            <div class="ns-pt-row"><span class="ns-pt-combo">💫💫💫</span><span class="ns-pt-val">+15</span></div>
+            <div class="ns-pt-row"><span class="ns-pt-combo">Any pair</span><span class="ns-pt-val">+5</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="ns-disclaimer">
+        <p class="ln-game-disclaimer">
+          Virtual coins only · No real-money value · For entertainment purposes only · 18+ · Balance resets on page refresh
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ── SUPPORT ASIDE ─────────────────────────────── -->
+    <div class="ln-container">
+      <aside class="ln-support" aria-label="UK gambling support resources">
+        <p class="ln-support__title">Need Support? You Are Not Alone.</p>
+        <p>If gambling is causing you stress, free help is available 24/7.</p>
+        <div class="ln-support__links">
+          <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware</a>
+          <a href="https://www.gamcare.org.uk" target="_blank" rel="noopener noreferrer">GamCare 0808 8020 133</a>
+          <a href="https://www.gamstop.co.uk" target="_blank" rel="noopener noreferrer">GAMSTOP Self-Exclusion</a>
+          <a href="https://www.gamblingcommission.gov.uk" target="_blank" rel="noopener noreferrer">UK Gambling Commission</a>
+          <a href="https://www.samaritans.org" target="_blank" rel="noopener noreferrer">Samaritans 116 123</a>
+          <a href="https://www.nhs.uk/live-well/addiction-support/gambling-addiction/" target="_blank" rel="noopener noreferrer">NHS Gambling Support</a>
+        </div>
+      </aside>
+    </div>
+
+  </main>
+
+  <!-- ── FOOTER ────────────────────────────────────── -->
+  <footer class="ln-footer" role="contentinfo">
+    <div class="ln-container">
+      <div class="ln-footer__grid">
+        <div class="ln-footer__col">
+          <a href="index.html" class="ln-footer__logo">✦ LuckyNova</a>
+          <p class="ln-footer__desc">A free social casino platform for UK adults 18+. No real-money gambling. Virtual coins only.</p>
+          <p class="ln-footer__disclaimer">Not affiliated with any gambling operator. Not licensed by UKGC.</p>
+        </div>
+        <div class="ln-footer__col">
+          <div class="ln-footer__col-title">Navigation</div>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#games">Games</a></li>
+            <li><a href="responsible-play.html">Responsible Play</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Use</a></li>
+            <li><a href="cookies.html">Cookie Policy</a></li>
+          </ul>
+        </div>
+        <div class="ln-footer__col">
+          <div class="ln-footer__col-title">Support</div>
+          <ul>
+            <li><a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware</a></li>
+            <li><a href="https://www.gamcare.org.uk" target="_blank" rel="noopener noreferrer">GamCare</a></li>
+            <li><a href="https://www.gamstop.co.uk" target="_blank" rel="noopener noreferrer">GAMSTOP</a></li>
+            <li><a href="https://www.gamblingcommission.gov.uk" target="_blank" rel="noopener noreferrer">Gambling Commission</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="ln-footer__bottom">
+        © <span data-year></span> LuckyNova. 18+ only. Not affiliated with any gambling operator.
+        All games are free to play. No real money, no real prizes.
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/ln-app.js" defer></script>
+  <script>
+    // Nova Slots — page-specific game logic
+    (function () {
+      var SYMBOLS = ['🪐', '🚀', '☄️', '🌟', '🌙', '💫'];
+      var PAYTABLE = { '🪐🪐🪐': 100, '🚀🚀🚀': 80, '☄️☄️☄️': 60, '🌟🌟🌟': 40, '🌙🌙🌙': 25, '💫💫💫': 15 };
+      var BET = 10, START = 500;
+      var balance = START, spinning = false;
+
+      var reels = [
+        document.getElementById('ns-reel-1'),
+        document.getElementById('ns-reel-2'),
+        document.getElementById('ns-reel-3')
+      ];
+      var balEl  = document.getElementById('ns-balance');
+      var msgEl  = document.getElementById('ns-message');
+      var spinBtn = document.getElementById('ns-spin');
+      var resetBtn = document.getElementById('ns-reset');
+
+      function rand() { return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]; }
+
+      function updateUI() {
+        balEl.textContent = balance;
+        spinBtn.disabled = balance < BET || spinning;
+        resetBtn.style.display = balance < BET ? 'inline-block' : 'none';
+      }
+
+      function msg(text, gold) {
+        msgEl.textContent = text;
+        msgEl.style.color = gold ? 'var(--ln-gold)' : 'var(--ln-muted)';
+      }
+
+      function spin() {
+        if (spinning || balance < BET) return;
+        spinning = true;
+        balance -= BET;
+        updateUI();
+        msg('Spinning…', false);
+        reels.forEach(function (r) { r.classList.remove('win'); r.classList.add('spinning'); });
+
+        var result = [];
+        var delays = [420, 660, 900];
+        reels.forEach(function (reel, i) {
+          setTimeout(function () {
+            reel.classList.remove('spinning');
+            result[i] = rand();
+            reel.textContent = result[i];
+            if (i === 2) {
+              setTimeout(function () { evaluate(result); }, 80);
+            }
+          }, delays[i]);
+        });
+      }
+
+      function evaluate(r) {
+        var key = r.join('');
+        var win = PAYTABLE[key] || 0;
+        if (win > 0) {
+          balance += win;
+          msg('🎉 ' + r[0] + r[1] + r[2] + '  +' + win + ' coins!', true);
+          reels.forEach(function (reel) { reel.classList.add('win'); });
+          setTimeout(function () { reels.forEach(function (reel) { reel.classList.remove('win'); }); }, 2000);
+        } else {
+          var counts = {};
+          r.forEach(function (s) { counts[s] = (counts[s] || 0) + 1; });
+          if (Object.values(counts).some(function (c) { return c >= 2; })) {
+            balance += 5;
+            msg('👾 Pair! +5 coins', true);
+          } else {
+            msg('No match — spin again!', false);
+          }
+        }
+        spinning = false;
+        updateUI();
+      }
+
+      spinBtn.addEventListener('click', spin);
+      resetBtn.addEventListener('click', function () {
+        balance = START;
+        reels.forEach(function (r) { r.textContent = '⭐'; r.classList.remove('win'); });
+        msg('Fresh start! 🚀', true);
+        updateUI();
+      });
+
+      updateUI();
+    })();
+  </script>
+</body>
+</html>
